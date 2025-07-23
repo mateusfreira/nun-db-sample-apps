@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Finance Manager</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <header class="app-header">
+            <h1>📊 Personal Finance Manager</h1>
+            <div class="header-controls">
+                <div class="connection-status" id="connectionStatus">
+                    <span class="status-indicator"></span>
+                    <span class="status-text">Connecting...</span>
+                </div>
+                <div class="user-info">
+                    <span id="userId">User: Loading...</span>
+                    <button id="resetBtn" class="btn btn-danger btn-small">Reset Data</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <!-- Loading Screen -->
+            <div id="loadingScreen" class="loading-screen">
+                <div class="loading-spinner"></div>
+                <p>Connecting to Personal Finance Manager...</p>
+            </div>
+
+            <!-- Main Dashboard -->
+            <div id="dashboard" class="dashboard" style="display: none;">
+                <!-- Financial Summary -->
+                <section class="summary-section">
+                    <h2>Financial Summary</h2>
+                    <div class="summary-cards">
+                        <div class="summary-card">
+                            <div class="card-header">Net Worth</div>
+                            <div class="card-value" id="netWorth">$0.00</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="card-header">Total Assets</div>
+                            <div class="card-value" id="totalAssets">$0.00</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="card-header">Total Liabilities</div>
+                            <div class="card-value" id="totalLiabilities">$0.00</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="card-header">Monthly Income</div>
+                            <div class="card-value" id="monthlyIncome">$0.00</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="card-header">Monthly Expenses</div>
+                            <div class="card-value" id="monthlyExpenses">$0.00</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="card-header">Monthly Savings</div>
+                            <div class="card-value" id="monthlySavings">$0.00</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Accounts Management -->
+                <section class="accounts-section">
+                    <div class="section-header">
+                        <h2>Accounts</h2>
+                        <button id="createAccountBtn" class="btn btn-primary">+ Create Account</button>
+                    </div>
+                    
+                    <div class="accounts-container">
+                        <div class="accounts-hierarchy" id="accountsHierarchy">
+                            <div class="empty-state">
+                                <p>No accounts created yet. Create your first account to get started!</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Transactions Management -->
+                <section class="transactions-section">
+                    <div class="section-header">
+                        <h2>Recent Transactions</h2>
+                        <div class="transaction-controls">
+                            <select id="transactionFilter" class="form-select">
+                                <option value="">All Accounts</option>
+                            </select>
+                            <button id="createTransactionBtn" class="btn btn-primary">+ New Transaction</button>
+                        </div>
+                    </div>
+                    
+                    <div class="transactions-container">
+                        <div class="transactions-list" id="transactionsList">
+                            <div class="empty-state">
+                                <p>No transactions yet. Create your first transaction!</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- Create Account Modal -->
+        <div id="createAccountModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Create New Account</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <form id="createAccountForm">
+                    <div class="form-group">
+                        <label for="accountName">Account Name*</label>
+                        <input type="text" id="accountName" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="accountType">Account Type*</label>
+                        <select id="accountType" name="type" required>
+                            <option value="">Select Type</option>
+                            <option value="asset">Asset</option>
+                            <option value="liability">Liability</option>
+                            <option value="income">Income</option>
+                            <option value="expense">Expense</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="parentAccount">Parent Account</label>
+                        <select id="parentAccount" name="parentId">
+                            <option value="">None (Root Account)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="initialBalance">Initial Balance</label>
+                        <input type="number" id="initialBalance" name="balance" step="0.01" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="currency">Currency</label>
+                        <select id="currency" name="currency">
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                            <option value="GBP">GBP</option>
+                            <option value="CAD">CAD</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary modal-cancel">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Create Account</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Create Transaction Modal -->
+        <div id="createTransactionModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Create New Transaction</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <form id="createTransactionForm">
+                    <div class="form-group">
+                        <label for="transactionDescription">Description*</label>
+                        <input type="text" id="transactionDescription" name="description" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="transactionAmount">Amount*</label>
+                        <input type="number" id="transactionAmount" name="amount" step="0.01" required>
+                        <small>Positive for income, negative for expenses</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="fromAccount">From Account*</label>
+                        <select id="fromAccount" name="fromAccountId" required>
+                            <option value="">Select Account</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="toAccount">To Account</label>
+                        <select id="toAccount" name="toAccountId">
+                            <option value="">None (External)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="transactionCategory">Category</label>
+                        <select id="transactionCategory" name="category">
+                            <option value="general">General</option>
+                            <option value="groceries">Groceries</option>
+                            <option value="utilities">Utilities</option>
+                            <option value="entertainment">Entertainment</option>
+                            <option value="transportation">Transportation</option>
+                            <option value="healthcare">Healthcare</option>
+                            <option value="income">Income</option>
+                            <option value="investment">Investment</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="transactionDate">Date</label>
+                        <input type="date" id="transactionDate" name="date">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary modal-cancel">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Create Transaction</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Notifications -->
+        <div id="notifications" class="notifications-container"></div>
+    </div>
+
+    <script src="app-simple.js"></script>
+</body>
+</html>

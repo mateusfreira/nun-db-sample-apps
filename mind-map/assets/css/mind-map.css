@@ -1,0 +1,310 @@
+.mind-map-node {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #667eea;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 3px solid white;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+.mind-map-node:hover {
+    transform: translate(-50%, -50%) scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.mind-map-node.selected {
+    border-color: #ef4444;
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
+}
+
+.mind-map-node.dragging {
+    transform: translate(-50%, -50%) scale(1.05);
+    z-index: 20;
+    cursor: grabbing;
+}
+
+.mind-map-connection {
+    position: absolute;
+    stroke: #6b7280;
+    stroke-width: 2;
+    fill: none;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.mind-map-connection.selected {
+    stroke: #ef4444;
+    stroke-width: 3;
+}
+
+.mind-map-connection.temp {
+    stroke: #667eea;
+    stroke-dasharray: 5, 5;
+    stroke-width: 2;
+}
+
+.connection-endpoint {
+    fill: #6b7280;
+    r: 4;
+}
+
+.connection-endpoint.selected {
+    fill: #ef4444;
+    r: 5;
+}
+
+.node-editor {
+    position: absolute;
+    background: white;
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    border: 1px solid #e5e7eb;
+    z-index: 100;
+    min-width: 200px;
+}
+
+.node-editor input {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.node-editor .color-picker {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.color-option {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+}
+
+.color-option.selected {
+    border-color: #374151;
+}
+
+.node-editor .actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.selection-box {
+    position: absolute;
+    border: 2px dashed #667eea;
+    background: rgba(102, 126, 234, 0.1);
+    pointer-events: none;
+    z-index: 15;
+}
+
+.minimap {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    width: 150px;
+    height: 100px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+}
+
+.minimap-viewport {
+    position: absolute;
+    border: 2px solid #667eea;
+    background: rgba(102, 126, 234, 0.1);
+    cursor: pointer;
+}
+
+.minimap-node {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #667eea;
+}
+
+.context-menu {
+    position: absolute;
+    background: white;
+    border-radius: 8px;
+    padding: 8px 0;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    border: 1px solid #e5e7eb;
+    z-index: 200;
+    min-width: 150px;
+}
+
+.context-menu-item {
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.context-menu-item:hover {
+    background: #f3f4f6;
+}
+
+.context-menu-item.danger:hover {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.context-menu-separator {
+    height: 1px;
+    background: #e5e7eb;
+    margin: 4px 0;
+}
+
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    color: #111827;
+    padding: 16px 20px;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    border: 1px solid #e5e7eb;
+    z-index: 1000;
+    max-width: 400px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.toast.show {
+    transform: translateX(0);
+}
+
+.toast.success {
+    border-left: 4px solid #10b981;
+}
+
+.toast.error {
+    border-left: 4px solid #ef4444;
+}
+
+.toast.warning {
+    border-left: 4px solid #f59e0b;
+}
+
+.toast.info {
+    border-left: 4px solid #3b82f6;
+}
+
+.toast-icon {
+    font-size: 18px;
+}
+
+.toast-message {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    font-size: 16px;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 0;
+}
+
+.node-animations-enter {
+    animation: nodeEnter 0.3s ease;
+}
+
+@keyframes nodeEnter {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
+.node-animations-exit {
+    animation: nodeExit 0.3s ease;
+}
+
+@keyframes nodeExit {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+    }
+}
+
+.connection-animations-draw {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: drawConnection 0.5s ease forwards;
+}
+
+@keyframes drawConnection {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .mind-map-node {
+        width: 50px;
+        height: 50px;
+        font-size: 10px;
+    }
+
+    .minimap {
+        width: 120px;
+        height: 80px;
+    }
+
+    .toast {
+        right: 16px;
+        left: 16px;
+        max-width: none;
+        transform: translateY(-100%);
+    }
+
+    .toast.show {
+        transform: translateY(0);
+    }
+
+    .node-editor {
+        min-width: 160px;
+    }
+}

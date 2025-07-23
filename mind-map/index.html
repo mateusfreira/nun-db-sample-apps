@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mind Map - NunDB Example</title>
+    <link rel="stylesheet" href="assets/css/reset.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/layout.css">
+    <link rel="stylesheet" href="assets/css/mind-map.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Setup Screen -->
+        <div id="setup-screen" class="setup-screen">
+            <div class="setup-card card">
+                <div class="header">
+                    <img src="assets/images/logo-nundb.png" alt="NunDB Logo" class="logo">
+                    <div class="header-content">
+                        <div class="header-title">🧠 Mind Map</div>
+                        <div class="header-subtitle">Real-time collaborative mind mapping with NunDB</div>
+                    </div>
+                    <div class="header-links">
+                        <a href="https://github.com/mateusfreira/nun-db-sample-apps" target="_blank" class="header-link">📁 Repository</a>
+                        <a href="https://github.com/mateusfreira/nun-db" target="_blank" class="header-link">🔧 NunDB</a>
+                    </div>
+                </div>
+
+                <div class="card-content">
+                    <h3>Choose Your Workspace</h3>
+                    <p>Enter a unique workspace name to create or join a collaborative mind mapping session.</p>
+                    
+                    <div class="form-group">
+                        <input 
+                            type="text" 
+                            id="workspace-input" 
+                            class="input"
+                            placeholder="e.g., team-brainstorm, project-ideas"
+                            maxlength="50"
+                        >
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary" id="join-workspace-btn" disabled>
+                            🚀 Join Workspace
+                        </button>
+                    </div>
+                    
+                    <div class="info-box">
+                        <h4>How it works:</h4>
+                        <ul>
+                            <li>Choose a unique workspace name</li>
+                            <li>Share the workspace name with collaborators</li>
+                            <li>Create nodes by clicking on the canvas</li>
+                            <li>Connect nodes by dragging from one to another</li>
+                            <li>See real-time updates from all participants</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workspace Screen -->
+        <div id="workspace-screen" class="workspace-screen" style="display: none;">
+            <div class="header">
+                <img src="assets/images/logo-nundb.png" alt="NunDB Logo" class="logo">
+                <div class="header-content">
+                    <div class="header-title">🧠 Mind Map</div>
+                    <div class="header-subtitle" id="workspace-name">Real-time collaborative mind mapping</div>
+                </div>
+                
+                <div class="header-links">
+                    <div class="connection-status" id="connection-status">
+                        <span class="loading"></span> Connecting...
+                    </div>
+                    <button class="header-link" id="leave-workspace-btn">
+                        🔄 Change Workspace
+                    </button>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <div class="toolbar" id="toolbar">
+                    <!-- Toolbar content will be dynamically generated -->
+                </div>
+
+                <div class="canvas-container">
+                    <div id="canvas" class="canvas">
+                        <!-- Canvas content will be dynamically generated -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/nun-db@latest/index.js"></script>
+    <script type="module" src="app.js"></script>
+</body>
+</html>

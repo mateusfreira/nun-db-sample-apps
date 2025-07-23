@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Comment Feed - NunDB</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <img src="../logo-nundb.png" alt="NunDB" class="logo">
+            <div class="header-content">
+                <h1>Live Comment Feed</h1>
+                <p>Real-time comment system with approval filtering and instant likes</p>
+            </div>
+            <div class="github-links">
+                <a href="https://github.com/mateusfreira/nun-db-sample-apps" class="github-link">
+                    View on GitHub
+                </a>
+                <a href="https://github.com/mateusfreira/nun-db" class="github-link">
+                    NunDB Project
+                </a>
+            </div>
+            <div id="connectionStatus" class="connection-status connecting">
+                <span class="loading"></span> Connecting...
+            </div>
+        </div>
+
+        <!-- Feed Setup -->
+        <div id="setupScreen" class="main-content">
+            <div class="setup-section">
+                <h3>Join Comment Feed</h3>
+                <p>Enter a feed ID to join the real-time discussion</p>
+                <div class="feed-input">
+                    <input 
+                        type="text" 
+                        id="feedIdInput" 
+                        placeholder="e.g., tech-discussion" 
+                        pattern="[a-zA-Z0-9_\-]+"
+                        title="Only letters, numbers, hyphens and underscores allowed"
+                    >
+                    <button class="btn btn-primary" id="joinFeedBtn" disabled>
+                        Join Feed
+                    </button>
+                </div>
+                <div class="quick-access">
+                    <h4>Popular Feeds:</h4>
+                    <button class="btn btn-secondary quick-feed-btn" data-feed="tech-news">Tech News</button>
+                    <button class="btn btn-secondary quick-feed-btn" data-feed="gaming-chat">Gaming Chat</button>
+                    <button class="btn btn-secondary quick-feed-btn" data-feed="general-discussion">General Discussion</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Feed Interface -->
+        <div id="feedScreen" class="feed-screen" style="display: none;">
+            <!-- Feed Info Bar -->
+            <div class="feed-bar">
+                <div class="feed-info">
+                    <span id="currentFeedId">Feed: loading...</span>
+                    <span class="separator">•</span>
+                    <span id="approvedCount">0 comments</span>
+                    <span class="separator">•</span>
+                    <span id="onlineUsers">1 online</span>
+                </div>
+                <div class="feed-actions">
+                    <button class="btn btn-secondary" id="toggleModeBtn">
+                        👤 User Mode
+                    </button>
+                    <button class="btn btn-secondary" id="leaveFeedBtn">
+                        ↩ Leave Feed
+                    </button>
+                    <button class="btn btn-secondary" id="shareBtn" title="Copy feed link">
+                        🔗 Share
+                    </button>
+                </div>
+            </div>
+
+            <!-- Comment Input -->
+            <div class="comment-input-section" id="commentInputSection">
+                <div class="input-header">
+                    <h3>💬 Join the Conversation</h3>
+                    <span class="live-indicator">🔴 LIVE</span>
+                </div>
+                <div class="input-form">
+                    <input type="text" id="userNameInput" placeholder="Your name" required>
+                    <div class="message-input">
+                        <textarea 
+                            id="messageInput" 
+                            placeholder="What's on your mind?" 
+                            required
+                            maxlength="500"
+                        ></textarea>
+                        <div class="input-actions">
+                            <span class="char-counter">
+                                <span id="charCount">0</span>/500
+                            </span>
+                            <button class="btn btn-primary" id="postBtn" disabled>
+                                Post
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="moderation-notice">
+                    <p>💡 Comments appear immediately. Use the report button if you see inappropriate content.</p>
+                </div>
+            </div>
+
+            <!-- Admin Panel (Hidden by default) -->
+            <div class="admin-panel" id="adminPanel" style="display: none;">
+                <div class="admin-header">
+                    <h3>🛡️ Moderator Panel</h3>
+                    <div class="admin-stats">
+                        <span class="stat">
+                            <span class="stat-number" id="pendingCount">0</span>
+                            <span class="stat-label">Pending</span>
+                        </span>
+                        <span class="stat">
+                            <span class="stat-number" id="totalCount">0</span>
+                            <span class="stat-label">Total</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="pending-queue" id="pendingQueue">
+                    <div class="empty-queue">No pending comments</div>
+                </div>
+            </div>
+
+            <!-- Live Comments Feed -->
+            <div class="comments-feed">
+                <div class="feed-header">
+                    <h3>💬 Live Comments</h3>
+                    <div class="sort-controls">
+                        <button class="sort-btn active" data-sort="newest">Latest</button>
+                        <button class="sort-btn" data-sort="likes">Most Liked</button>
+                        <button class="sort-btn" data-sort="oldest">Oldest</button>
+                    </div>
+                </div>
+                <div id="commentsFeed" class="feed-content">
+                    <div class="feed-loading">
+                        <div class="loading"></div>
+                        <p>Loading live feed...</p>
+                    </div>
+                </div>
+                <div id="emptyFeed" class="empty-feed" style="display: none;">
+                    <div class="empty-icon">💬</div>
+                    <h4>No approved comments yet</h4>
+                    <p>Be the first to start the conversation!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/nun-db@latest/index.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

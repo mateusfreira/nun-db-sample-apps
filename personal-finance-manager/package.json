@@ -1,0 +1,29 @@
+{
+  "name": "personal-finance-manager",
+  "version": "1.0.0",
+  "description": "Real-time personal finance management system using NunDB",
+  "main": "src/app.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "playwright test --config=playwright.config.cjs",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "lint": "eslint src/ tests/",
+    "format": "prettier --write src/ tests/"
+  },
+  "dependencies": {
+    "nun-db": "latest",
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "eslint": "^8.55.0",
+    "prettier": "^3.1.0"
+  },
+  "keywords": ["finance", "real-time", "nundb", "personal-finance"],
+  "author": "NunDB Sample Apps",
+  "license": "MIT"
+}

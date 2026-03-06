@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar Booking - Real-Time Professional Scheduling</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <span class="logo-icon">📅</span>
+                    <h1 class="app-title">Calendar Booking</h1>
+                    <span class="tagline">Real-time professional scheduling</span>
+                </div>
+                
+                <div class="header-controls">
+                    <div class="connection-status" id="connectionStatus">
+                        <span class="status-indicator"></span>
+                        <span class="status-text">Connecting...</span>
+                    </div>
+                    <button id="todayBtn" class="btn btn-secondary">Today</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="professionals-section">
+                    <h2>Professionals</h2>
+                    <div class="professionals-filter">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="available">Available Now</button>
+                    </div>
+                    <div id="professionalsList" class="professionals-list">
+                        <!-- Professionals will be loaded here -->
+                    </div>
+                </div>
+
+                <div class="booking-form-section" id="bookingFormSection" style="display: none;">
+                    <h3>Book Appointment</h3>
+                    <form id="bookingForm" class="booking-form">
+                        <input type="hidden" id="selectedSlot" />
+                        <input type="hidden" id="selectedProfessional" />
+                        
+                        <div class="form-group">
+                            <label for="clientName">Your Name*</label>
+                            <input type="text" id="clientName" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="clientEmail">Email*</label>
+                            <input type="email" id="clientEmail" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="clientPhone">Phone</label>
+                            <input type="tel" id="clientPhone">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="serviceType">Service Type*</label>
+                            <select id="serviceType" required>
+                                <option value="">Select Service</option>
+                                <option value="consultation">Consultation (30 min)</option>
+                                <option value="checkup">Health Checkup (45 min)</option>
+                                <option value="therapy">Therapy Session (60 min)</option>
+                                <option value="followup">Follow-up (15 min)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="notes">Notes</label>
+                            <textarea id="notes" rows="3" placeholder="Additional information..."></textarea>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" id="cancelBooking" class="btn btn-secondary">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Book Appointment</button>
+                        </div>
+                    </form>
+                </div>
+            </aside>
+
+            <!-- Calendar Area -->
+            <div class="calendar-section">
+                <!-- Calendar Header -->
+                <div class="calendar-header">
+                    <div class="calendar-nav">
+                        <button id="prevWeek" class="nav-btn">‹</button>
+                        <h2 id="currentWeek" class="week-title"></h2>
+                        <button id="nextWeek" class="nav-btn">›</button>
+                    </div>
+                    
+                    <div class="view-controls">
+                        <button class="view-btn active" data-view="week">Week</button>
+                        <button class="view-btn" data-view="day">Day</button>
+                    </div>
+                </div>
+
+                <!-- Calendar Grid -->
+                <div class="calendar-container">
+                    <div class="time-column">
+                        <div class="time-header"></div>
+                        <div id="timeSlots" class="time-slots">
+                            <!-- Time slots will be generated here -->
+                        </div>
+                    </div>
+                    
+                    <div class="days-container" id="daysContainer">
+                        <!-- Days will be generated here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Booking Details Modal -->
+        <div id="bookingModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Appointment Details</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body" id="bookingDetails">
+                    <!-- Booking details will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button id="cancelAppointment" class="btn btn-danger">Cancel Appointment</button>
+                    <button class="modal-close btn btn-secondary">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading calendar...</p>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div id="toast" class="toast"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/nun-db@latest/index.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

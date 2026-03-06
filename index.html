@@ -17,6 +17,14 @@
                 collaborative features, and persistent storage capabilities. Each application 
                 is designed to run directly in your browser with zero setup required.
             </p>
+            <p class="description">
+                PS: All this applications are example of AI assisted development using NunDB as a database. It is not mine and I have not curated it as in any other project of mine I would. You can use them as examples or as a starting point for your own projects.
+
+                Most of them are projects where I wanted to see how the AI tools would behave when reasoning about NunDb APIs documentation.
+
+                If you want to see better code examples to follow please go check https://github.com/mateusfreira/nun-db-js/tree/master/examples
+
+            </p>
         </header>
         
         <main class="examples">
@@ -73,8 +81,164 @@
                     </a>
                 </div>
             </article>
+            
+            <article class="example-card">
+                <h2 class="example-title">
+                    <span class="example-icon">💬</span>
+                    Live Comment Feed
+                </h2>
+                <p class="example-description">
+                    A real-time commenting system that demonstrates NunDB's live synchronization capabilities. 
+                    Features instant updates, like/unlike functionality, reporting system, and user moderation 
+                    with persistent storage across sessions.
+                </p>
+                <ul class="features">
+                    <li>Real-time comment synchronization</li>
+                    <li>Like/unlike functionality with counters</li>
+                    <li>Comment reporting and moderation</li>
+                    <li>Sort by newest, oldest, or most liked</li>
+                    <li>Persistent comment storage</li>
+                </ul>
+                <div class="example-actions">
+                    <a href="live-comment-feed/" class="btn btn-primary">
+                        🚀 Launch App
+                    </a>
+                    <a href="live-comment-feed/README.md" class="btn btn-secondary">
+                        📖 Documentation
+                    </a>
+                </div>
+            </article>
+            
+            <article class="example-card">
+                <h2 class="example-title">
+                    <span class="example-icon">💰</span>
+                    Personal Finance Manager
+                </h2>
+                <p class="example-description">
+                    A comprehensive personal finance management system with real-time synchronization. 
+                    Track accounts, manage transactions, analyze spending patterns, and maintain a 
+                    clear view of your financial health with hierarchical account structures.
+                </p>
+                <ul class="features">
+                    <li>Hierarchical account management</li>
+                    <li>Real-time transaction tracking</li>
+                    <li>Financial analysis and reporting</li>
+                    <li>Multi-currency support</li>
+                    <li>Automatic balance calculations</li>
+                </ul>
+                <div class="example-actions">
+                    <a href="personal-finance-manager/" class="btn btn-primary">
+                        🚀 Launch App
+                    </a>
+                    <a href="personal-finance-manager/README.md" class="btn btn-secondary">
+                        📖 Documentation
+                    </a>
+                </div>
+            </article>
+            
+            <article class="example-card">
+                <h2 class="example-title">
+                    <span class="example-icon">📊</span>
+                    Live Poll
+                </h2>
+                <p class="example-description">
+                    Create instant polls with shareable links and watch results update in real-time. 
+                    Perfect for quick decisions, audience engagement, or gathering feedback with 
+                    beautiful visualizations and live vote tracking.
+                </p>
+                <ul class="features">
+                    <li>Short shareable URLs (6 characters)</li>
+                    <li>Real-time vote counting and results</li>
+                    <li>Single or multiple choice options</li>
+                    <li>Beautiful animated visualizations</li>
+                    <li>Duplicate vote prevention</li>
+                </ul>
+                <div class="example-actions">
+                    <a href="live-poll/" class="btn btn-primary">
+                        🚀 Launch App
+                    </a>
+                    <a href="live-poll/README.md" class="btn btn-secondary">
+                        📖 Documentation
+                    </a>
+                </div>
+            </article>
+            
+            <article class="example-card">
+                <h2 class="example-title">
+                    <span class="example-icon">📝</span>
+                    Collaborative Editor
+                </h2>
+                <p class="example-description">
+                    A real-time collaborative text editor powered by Automerge CRDTs and NunDB.
+                    Multiple users can edit the same document simultaneously with automatic
+                    conflict-free merging and instant synchronization across all connected clients.
+                </p>
+                <ul class="features">
+                    <li>Conflict-free real-time collaboration with Automerge CRDTs</li>
+                    <li>Automatic document merging across users</li>
+                    <li>Workspace-based document isolation</li>
+                    <li>Persistent storage with NunDB</li>
+                    <li>Zero setup - runs directly in browser using CDN</li>
+                </ul>
+                <div class="example-actions">
+                    <a href="collaborative-editor/" class="btn btn-primary">
+                        🚀 Launch App
+                    </a>
+                </div>
+            </article>
+
+            <article class="example-card">
+                <h2 class="example-title">
+                    <span class="example-icon">📅</span>
+                    Calendar Booking
+                </h2>
+                <p class="example-description">
+                    A beautiful real-time calendar booking system for professional services. 
+                    Features multi-professional support, instant appointment updates, and elegant 
+                    calendar interface with working hours management and conflict prevention.
+                </p>
+                <ul class="features">
+                    <li>Multi-professional calendar management</li>
+                    <li>Real-time appointment booking and updates</li>
+                    <li>Week and day calendar views</li>
+                    <li>Professional availability filtering</li>
+                    <li>Comprehensive booking form validation</li>
+                </ul>
+                <div class="example-actions">
+                    <a href="calendar-booking/" class="btn btn-primary">
+                        🚀 Launch App
+                    </a>
+                    <a href="calendar-booking/README.md" class="btn btn-secondary">
+                        📖 Documentation
+                    </a>
+                </div>
+            </article>
+
+            <article class="example-card">
+                <h2 class="example-title">
+                    <span class="example-icon">🦷</span>
+                    Dental Odontogram
+                </h2>
+                <p class="example-description">
+                    A canvas-based dental odontogram with realistic mouth-shaped arch layout.
+                    Click teeth to mark statuses like cavity, crown, implant, or missing,
+                    add clinical notes, and sync everything in real-time via NunDB.
+                </p>
+                <ul class="features">
+                    <li>Realistic arch-shaped tooth layout (32 teeth)</li>
+                    <li>7 dental statuses with color-coded visualization</li>
+                    <li>Per-tooth clinical notes</li>
+                    <li>Real-time sync across tabs via NunDB watch</li>
+                    <li>Session-based URLs for sharing patient charts</li>
+                </ul>
+                <div class="example-actions">
+                    <a href="teeth_system/" class="btn btn-primary">
+                        🚀 Launch App
+                    </a>
+                </div>
+            </article>
         </main>
-        
+
         <footer class="footer">
             <p>
                 <a href="https://github.com/mateusfreira/nun-db-sample-apps" target="_blank" class="github-link">📁 View this repository on GitHub</a>

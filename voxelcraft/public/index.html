@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoxelCraft - Multiplayer Voxel Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="menu" class="menu">
+        <h1>VoxelCraft</h1>
+        <p>A multiplayer voxel building game</p>
+        <input type="text" id="username" placeholder="Enter your username" maxlength="20">
+        <input type="text" id="roomId" placeholder="Room ID (optional)" maxlength="20">
+        <button id="playBtn">Play</button>
+        <div class="controls">
+            <h3>Controls:</h3>
+            <p>WASD - Move | Mouse - Look</p>
+            <p>Left Click - Destroy | Right Click - Place</p>
+            <p>1-9 - Select Block | T - Chat</p>
+        </div>
+    </div>
+
+    <div id="game" style="display: none;">
+        <div id="crosshair">+</div>
+        <div id="blockSelector" class="block-selector">
+            <div class="block-item selected" data-type="1">
+                <div class="block-preview grass"></div>
+                <span>1</span>
+            </div>
+            <div class="block-item" data-type="2">
+                <div class="block-preview dirt"></div>
+                <span>2</span>
+            </div>
+            <div class="block-item" data-type="3">
+                <div class="block-preview stone"></div>
+                <span>3</span>
+            </div>
+            <div class="block-item" data-type="4">
+                <div class="block-preview wood"></div>
+                <span>4</span>
+            </div>
+            <div class="block-item" data-type="5">
+                <div class="block-preview leaves"></div>
+                <span>5</span>
+            </div>
+            <div class="block-item" data-type="6">
+                <div class="block-preview sand"></div>
+                <span>6</span>
+            </div>
+            <div class="block-item" data-type="7">
+                <div class="block-preview water"></div>
+                <span>7</span>
+            </div>
+            <div class="block-item" data-type="8">
+                <div class="block-preview brick"></div>
+                <span>8</span>
+            </div>
+            <div class="block-item" data-type="9">
+                <div class="block-preview glass"></div>
+                <span>9</span>
+            </div>
+        </div>
+        
+        <div id="playerList" class="player-list">
+            <h3>Players</h3>
+            <ul id="players"></ul>
+        </div>
+
+        <div id="chat" class="chat">
+            <div id="chatMessages" class="chat-messages"></div>
+            <input type="text" id="chatInput" class="chat-input" placeholder="Press T to chat..." disabled>
+        </div>
+
+        <div id="debug" class="debug">
+            <span>FPS: <span id="fps">0</span></span>
+            <span>Pos: <span id="position">0,0,0</span></span>
+            <span>Blocks: <span id="blockCount">0</span></span>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/nun-db@latest/index.js"></script>
+    <script src="js/constants.js"></script>
+    <script src="js/blocks.js"></script>
+    <script src="js/world.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/controls.js"></script>
+    <script src="js/network.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

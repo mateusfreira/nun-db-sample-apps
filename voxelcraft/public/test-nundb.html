@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test NunDB Loading</title>
+</head>
+<body>
+    <h1>NunDB Loading Test</h1>
+    <div id="status">Loading...</div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/nun-db@1.8.2/dist/nun-db.js"></script>
+    <script>
+        setTimeout(() => {
+            const status = document.getElementById('status');
+            
+            if (typeof NunDb !== 'undefined') {
+                status.innerHTML = 'NunDb loaded successfully!';
+                console.log('NunDb is available:', NunDb);
+            } else if (typeof window.NunDb !== 'undefined') {
+                status.innerHTML = 'window.NunDb loaded successfully!';
+                console.log('window.NunDb is available:', window.NunDb);
+            } else if (typeof NunDB !== 'undefined') {
+                status.innerHTML = 'NunDB loaded successfully!';
+                console.log('NunDB is available:', NunDB);
+            } else {
+                status.innerHTML = 'Failed to load NunDB';
+                console.error('NunDB not found in any expected location');
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

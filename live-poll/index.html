@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Poll - Create & Vote in Real-Time</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Create Poll Page -->
+        <div id="createPage" class="page active">
+            <header class="header">
+                <h1 class="logo">
+                    <span class="logo-icon">📊</span>
+                    Live Poll
+                </h1>
+                <p class="tagline">Create instant polls, share & watch results in real-time</p>
+            </header>
+
+            <main class="create-container">
+                <form id="createPollForm" class="poll-form">
+                    <div class="form-section">
+                        <h2>Create Your Poll</h2>
+                        
+                        <div class="form-group">
+                            <label for="pollQuestion">Your Question</label>
+                            <input 
+                                type="text" 
+                                id="pollQuestion" 
+                                placeholder="What's your favorite programming language?"
+                                maxlength="200"
+                                required
+                            >
+                            <span class="char-count">0/200</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Poll Options</label>
+                            <div id="optionsList" class="options-list">
+                                <div class="option-input-group">
+                                    <input type="text" class="option-input" placeholder="Option 1" required>
+                                    <button type="button" class="btn-remove" disabled>×</button>
+                                </div>
+                                <div class="option-input-group">
+                                    <input type="text" class="option-input" placeholder="Option 2" required>
+                                    <button type="button" class="btn-remove" disabled>×</button>
+                                </div>
+                            </div>
+                            <button type="button" id="addOption" class="btn-add-option">
+                                + Add Option
+                            </button>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pollSettings">Settings</label>
+                            <div class="settings-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="allowMultiple">
+                                    <span>Allow multiple selections</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="showResults" checked>
+                                    <span>Show results after voting</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-create">
+                            Create Poll 🚀
+                        </button>
+                    </div>
+                </form>
+            </main>
+        </div>
+
+        <!-- Poll Voting Page -->
+        <div id="votePage" class="page">
+            <header class="poll-header">
+                <div class="poll-id">Poll ID: <span id="pollId"></span></div>
+                <button id="shareBtn" class="btn-share">
+                    <span class="share-icon">🔗</span>
+                    Share
+                </button>
+            </header>
+
+            <main class="vote-container">
+                <div class="poll-question-section">
+                    <h1 id="pollQuestionDisplay" class="poll-question"></h1>
+                    <div class="poll-meta">
+                        <span id="totalVotes">0 votes</span>
+                        <span class="separator">•</span>
+                        <span id="liveIndicator" class="live-indicator">
+                            <span class="pulse"></span>
+                            Live
+                        </span>
+                    </div>
+                </div>
+
+                <div id="votingSection" class="voting-section">
+                    <form id="voteForm" class="vote-form">
+                        <div id="optionsContainer" class="options-container"></div>
+                        <button type="submit" id="submitVote" class="btn-vote">
+                            Submit Vote
+                        </button>
+                    </form>
+                </div>
+
+                <div id="resultsSection" class="results-section" style="display: none;">
+                    <h2>Results</h2>
+                    <div id="resultsContainer" class="results-container"></div>
+                    <div class="results-footer">
+                        <button id="newPollBtn" class="btn-new-poll">
+                            Create New Poll
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-state">
+            <div class="spinner"></div>
+            <p>Connecting to poll...</p>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div id="toast" class="toast"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/nun-db@latest/index.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

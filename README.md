@@ -2,16 +2,8 @@
 
 Sample applications demonstrating NunDB capabilities in real-world scenarios.
 
-## Time Tracker
+All this applications are example of AI assisted development using NunDB as a database. It is not mine and I have not curated it as in any other project of mine I would. You can use them as examples or as a starting point for your own projects.
 
-A real-time collaborative time tracking application that showcases NunDB's synchronization capabilities.
+Most of them are projects where I wanted to see how the AI tools would behave when reasoning about NunDb APIs documentation.
 
-**Features:**
-- Real-time collaborative time tracking
-- Multi-user workspaces with URL-based sharing
-- Persistent task storage and time accumulation
-- Zero setup - runs directly in browser using CDN
-
-**Location:** `time-tracker/`
-
-**Quick start:** Open `time-tracker/index.html` in your browser
+If you want to see better code examples to follow please go check https://github.com/mateusfreira/nun-db-js/tree/master/examples

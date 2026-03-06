@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>VoxelCraft Debug</title>
+</head>
+<body>
+    <h1>VoxelCraft Debug Page</h1>
+    <div id="status">
+        <h2>Library Loading Status:</h2>
+        <p>Three.js: <span id="threejs">❌ Not loaded</span></p>
+        <p>NunDB: <span id="nundb">❌ Not loaded</span></p>
+        <h2>NunDB Connection Test:</h2>
+        <p>Connection: <span id="connection">Not attempted</span></p>
+        <p>Error: <span id="error">None</span></p>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/nun-db@latest/index.js"></script>
+    <script>
+        // Check Three.js
+        setTimeout(() => {
+            if (typeof THREE !== 'undefined') {
+                document.getElementById('threejs').innerHTML = '✅ Loaded';
+                console.log('Three.js loaded:', THREE);
+            }
+            
+            // Check NunDB
+            if (typeof NunDb !== 'undefined') {
+                document.getElementById('nundb').innerHTML = '✅ Loaded as NunDb';
+                console.log('NunDb loaded:', NunDb);
+                testNunDb();
+            } else if (typeof window.NunDb !== 'undefined') {
+                document.getElementById('nundb').innerHTML = '✅ Loaded as window.NunDb';
+                console.log('window.NunDb loaded:', window.NunDb);
+                testNunDb();
+            } else {
+                document.getElementById('nundb').innerHTML = '❌ Failed to load';
+                console.error('NunDB not found');
+            }
+        }, 1000);
+        
+        async function testNunDb() {
+            document.getElementById('connection').innerHTML = 'Attempting...';
+            
+            try {
+                const NunDbClass = window.NunDb || NunDb;
+                const nundb = new NunDbClass({
+                    url: 'wss://ws-staging.nundb.org/',
+                    db: 'voxelcraft-test',
+                    token: 'demo-token'
+                });
+                
+                await nundb._connectionPromise;
+                document.getElementById('connection').innerHTML = '✅ Connected';
+                
+                // Test basic operations
+                await nundb.set('test-key', 'test-value');
+                const value = await nundb.getValue('test-key');
+                console.log('Test value:', value);
+                
+                // Clean up
+                await nundb.remove('test-key');
+                
+            } catch (error) {
+                document.getElementById('connection').innerHTML = '❌ Failed';
+                document.getElementById('error').innerHTML = error.message;
+                console.error('Connection error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

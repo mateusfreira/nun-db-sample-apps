@@ -1,0 +1,26 @@
+{
+  "name": "calendar-booking",
+  "version": "1.0.0",
+  "description": "Real-time professional scheduling application with NunDB",
+  "main": "app.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:ui": "playwright test --ui",
+    "serve": "python3 -m http.server 3004"
+  },
+  "keywords": [
+    "nundb",
+    "calendar",
+    "booking",
+    "scheduling",
+    "real-time",
+    "professional"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0"
+  }
+}

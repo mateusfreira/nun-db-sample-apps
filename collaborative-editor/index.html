@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collaborative Text Editor - Real-Time with Automerge + NunDB</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Setup Screen -->
+        <div id="setup-screen" class="screen setup-screen">
+            <div class="setup-card">
+                <div class="setup-header">
+                    <img src="logo-nundb.png" alt="NunDB Logo" class="logo">
+                    <h1>Collaborative Editor</h1>
+                    <p class="tagline">Real-time collaborative text editing with Automerge CRDTs + NunDB</p>
+                </div>
+                <div class="setup-form">
+                    <label for="workspace-input">Workspace Name</label>
+                    <input
+                        type="text"
+                        id="workspace-input"
+                        placeholder="Enter a workspace name..."
+                        pattern="[a-zA-Z0-9_-]+"
+                        required
+                        autocomplete="off"
+                    >
+                    <p class="input-hint">Letters, numbers, hyphens and underscores only</p>
+                    <button id="join-btn" class="btn-join" disabled>Join Workspace</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Editor Screen -->
+        <div id="editor-screen" class="screen editor-screen" style="display: none;">
+            <header class="editor-header">
+                <div class="header-left">
+                    <img src="logo-nundb.png" alt="NunDB Logo" class="logo-small">
+                    <span class="workspace-label">Workspace: <strong id="workspace-name"></strong></span>
+                </div>
+                <div class="header-right">
+                    <span id="connection-status" class="connection-status">
+                        <span class="status-dot"></span>
+                        <span class="status-text">Connecting...</span>
+                    </span>
+                    <button id="change-workspace-btn" class="btn-change">Change Workspace</button>
+                </div>
+            </header>
+
+            <main class="editor-body">
+                <input
+                    type="text"
+                    id="doc-title"
+                    class="editor-title"
+                    placeholder="Untitled Document"
+                    autocomplete="off"
+                >
+                <textarea
+                    id="doc-content"
+                    class="editor-content"
+                    placeholder="Start typing your document here..."
+                ></textarea>
+            </main>
+
+            <footer class="editor-footer">
+                <span id="save-status" class="save-status">Ready</span>
+                <span id="last-saved" class="last-saved"></span>
+            </footer>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/nun-db@latest/index.js"></script>
+    <script type="module" src="app.js"></script>
+</body>
+</html>

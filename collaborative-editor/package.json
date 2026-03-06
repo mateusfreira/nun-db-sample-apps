@@ -1,0 +1,26 @@
+{
+  "name": "collaborative-editor",
+  "version": "1.0.0",
+  "description": "Collaborative text editor with Automerge CRDTs and NunDB real-time sync",
+  "main": "app.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:ui": "playwright test --ui",
+    "serve": "python3 -m http.server 3005"
+  },
+  "keywords": [
+    "nundb",
+    "automerge",
+    "crdt",
+    "collaborative",
+    "editor",
+    "real-time"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0"
+  }
+}

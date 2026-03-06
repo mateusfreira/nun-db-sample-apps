@@ -1,0 +1,34 @@
+{
+  "name": "fps-arena",
+  "version": "1.0.0",
+  "description": "Real-time multiplayer FPS arena game using NunDB",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "serve": "serve public -l 3000",
+    "start": "node src/server.js",
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "lint": "eslint src public --ext .js",
+    "lint:fix": "eslint src public --ext .js --fix"
+  },
+  "keywords": [
+    "nundb",
+    "fps",
+    "multiplayer",
+    "real-time",
+    "arena",
+    "game"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "serve": "^14.2.1",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "eslint": "^8.55.0"
+  }
+}

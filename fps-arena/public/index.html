@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FPS Arena - Real-time Multiplayer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Name Entry Modal -->
+    <div id="nameModal" class="modal">
+        <div class="modal-content">
+            <h2>Welcome to FPS Arena</h2>
+            <form id="nameForm">
+                <label for="playerName">Enter your player name:</label>
+                <input type="text" id="playerName" maxlength="20" required autocomplete="off">
+                <div class="error-message" id="nameError"></div>
+                <button type="submit">Join Game</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Role Selection Modal -->
+    <div id="roleModal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Select Your Role</h2>
+            <div class="role-selection">
+                <div class="role-card" data-role="assault">
+                    <div class="role-icon">⚔️</div>
+                    <h3>Assault</h3>
+                    <p>Balanced speed & damage. Perfect for newcomers.</p>
+                    <ul>
+                        <li>Speed: ⭐⭐⭐</li>
+                        <li>Damage: ⭐⭐⭐</li>
+                        <li>Health: ⭐⭐⭐</li>
+                    </ul>
+                </div>
+                <div class="role-card" data-role="sniper">
+                    <div class="role-icon">🎯</div>
+                    <h3>Sniper</h3>
+                    <p>High damage at long range, slower movement.</p>
+                    <ul>
+                        <li>Speed: ⭐</li>
+                        <li>Damage: ⭐⭐⭐⭐⭐</li>
+                        <li>Health: ⭐⭐</li>
+                    </ul>
+                </div>
+                <div class="role-card" data-role="medic">
+                    <div class="role-icon">🏥</div>
+                    <h3>Medic</h3>
+                    <p>Low damage but can heal teammates.</p>
+                    <ul>
+                        <li>Speed: ⭐⭐⭐⭐</li>
+                        <li>Damage: ⭐⭐</li>
+                        <li>Health: ⭐⭐⭐⭐</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Canvas and UI -->
+    <div id="gameContainer" class="hidden">
+        <!-- HUD -->
+        <div id="hud">
+            <div id="playerInfo">
+                <div id="playerName"></div>
+                <div id="playerRole"></div>
+            </div>
+            <div id="stats">
+                <div id="healthBar">
+                    <label>Health:</label>
+                    <div class="bar">
+                        <div id="healthFill" class="fill"></div>
+                    </div>
+                    <span id="healthText">100/100</span>
+                </div>
+                <div id="ammoCounter">
+                    <label>Ammo:</label>
+                    <span id="ammoText">30/30</span>
+                </div>
+            </div>
+            <div id="roleActions">
+                <!-- Role-specific actions will be added here -->
+            </div>
+        </div>
+
+        <!-- Game Canvas -->
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+        <!-- Controls Help -->
+        <div id="controls">
+            <h4>Controls:</h4>
+            <p>WASD/Arrow Keys: Move | Spacebar: Shoot | R: Reload | H: Heal (Medic)</p>
+        </div>
+
+        <!-- Player List -->
+        <div id="playerList">
+            <h4>Players:</h4>
+            <div id="players"></div>
+        </div>
+    </div>
+
+    <!-- Connection Status -->
+    <div id="connectionStatus">
+        <span class="status-indicator"></span>
+        <span class="status-text">Connecting...</span>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/nun-db@latest/index.js"></script>
+    <script type="module" src="game.js"></script>
+</body>
+</html>

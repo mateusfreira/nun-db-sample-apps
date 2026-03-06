@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>VoxelCraft Load Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .success { color: green; }
+        .error { color: red; }
+        .loading { color: orange; }
+    </style>
+</head>
+<body>
+    <h1>VoxelCraft Script Loading Test</h1>
+    <div id="results"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/nun-db@latest/index.js"></script>
+    
+    <script>
+        const results = document.getElementById('results');
+        
+        function addResult(script, status, error = null) {
+            const div = document.createElement('div');
+            div.className = status;
+            div.innerHTML = `${script}: <strong>${status}</strong>` + (error ? ` - ${error}` : '');
+            results.appendChild(div);
+        }
+        
+        // Check Three.js
+        setTimeout(() => {
+            if (typeof THREE !== 'undefined') {
+                addResult('Three.js', 'success');
+            } else {
+                addResult('Three.js', 'error', 'Not loaded');
+            }
+            
+            // Check NunDB
+            if (typeof NunDb !== 'undefined' || typeof window.NunDb !== 'undefined') {
+                addResult('NunDB', 'success');
+            } else {
+                addResult('NunDB', 'error', 'Not loaded');
+            }
+            
+            // Load game scripts
+            const scripts = [
+                'js/constants.js',
+                'js/blocks.js',
+                'js/world.js',
+                'js/player.js',
+                'js/controls.js',
+                'js/network.js',
+                'js/chat.js',
+                'js/game.js',
+                'js/main.js'
+            ];
+            
+            let loadedCount = 0;
+            
+            scripts.forEach(script => {
+                const scriptElement = document.createElement('script');
+                scriptElement.src = script;
+                
+                scriptElement.onload = () => {
+                    addResult(script, 'success');
+                    loadedCount++;
+                    
+                    if (loadedCount === scripts.length) {
+                        // Check if classes are available
+                        setTimeout(() => {
+                            addResult('Block class', typeof Block !== 'undefined' ? 'success' : 'error');
+                            addResult('World class', typeof World !== 'undefined' ? 'success' : 'error');
+                            addResult('Player class', typeof Player !== 'undefined' ? 'success' : 'error');
+                            addResult('Controls class', typeof Controls !== 'undefined' ? 'success' : 'error');
+                            addResult('NetworkManager class', typeof NetworkManager !== 'undefined' ? 'success' : 'error');
+                            addResult('ChatManager class', typeof ChatManager !== 'undefined' ? 'success' : 'error');
+                            addResult('Game class', typeof Game !== 'undefined' ? 'success' : 'error');
+                        }, 100);
+                    }
+                };
+                
+                scriptElement.onerror = (e) => {
+                    addResult(script, 'error', 'Failed to load');
+                    console.error('Failed to load:', script, e);
+                };
+                
+                document.head.appendChild(scriptElement);
+            });
+        }, 500);
+    </script>
+</body>
+</html>

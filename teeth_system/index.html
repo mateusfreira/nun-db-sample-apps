@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dental Odontogram</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 24px 16px;
+            color: #1a1a2e;
+        }
+        h1 { font-size: 1.5rem; margin-bottom: 4px; }
+        .subtitle { font-size: 0.85rem; color: #6b7280; margin-bottom: 16px; }
+        #toolbar {
+            display: flex; gap: 6px; margin-bottom: 16px;
+            flex-wrap: wrap; justify-content: center;
+        }
+        .tool-btn {
+            padding: 6px 14px; border: 2px solid #d1d5db; border-radius: 20px;
+            background: #fff; cursor: pointer; font-size: 13px; font-weight: 500;
+            transition: all 0.15s ease; text-transform: capitalize;
+        }
+        .tool-btn:hover { border-color: #6b7280; background: #f9fafb; }
+        .tool-btn.active { color: #fff; border-color: transparent; }
+        .tool-btn[data-tool="healthy"].active  { background: #4caf50; }
+        .tool-btn[data-tool="cavity"].active    { background: #e53935; }
+        .tool-btn[data-tool="missing"].active   { background: #757575; }
+        .tool-btn[data-tool="crown"].active     { background: #fbc02d; color: #333; }
+        .tool-btn[data-tool="implant"].active   { background: #1e88e5; }
+        .tool-btn[data-tool="fracture"].active  { background: #fb8c00; }
+        .tool-btn[data-tool="watch"].active     { background: #8e24aa; }
+        canvas {
+            background: #fff; border-radius: 12px;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.08); cursor: pointer;
+        }
+        #note-panel {
+            margin-top: 12px; display: none; align-items: center; gap: 8px;
+            background: #fff; padding: 10px 16px; border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+        #note-panel.visible { display: flex; }
+        #note-label { font-weight: 600; font-size: 14px; white-space: nowrap; }
+        #note-input {
+            padding: 6px 10px; border: 1px solid #d1d5db; border-radius: 6px;
+            font-size: 14px; width: 280px; outline: none;
+        }
+        #note-input:focus { border-color: #1e88e5; box-shadow: 0 0 0 2px rgba(30,136,229,0.15); }
+        #session-info { margin-top: 10px; font-size: 11px; color: #9ca3af; }
+        #connection-status { margin-top: 4px; font-size: 11px; color: #9ca3af; }
+        #connection-status.connected { color: #4caf50; }
+        #connection-status.error { color: #e53935; }
+    </style>
+</head>
+<body>
+    <h1>Dental Odontogram</h1>
+    <p class="subtitle">Click a tool, then click a tooth to apply. Click a tooth to edit its note.</p>
+    <div id="toolbar"></div>
+    <canvas id="canvas" width="700" height="620"></canvas>
+    <div id="note-panel">
+        <label id="note-label">Tooth 1:</label>
+        <input id="note-input" type="text" maxlength="100" placeholder="Add a note...">
+    </div>
+    <div id="session-info"></div>
+    <div id="connection-status">Connecting...</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/nun-db@latest/index.js"></script>
+    <script>
+    /* ================================================================
+       ODONTOGRAM APP — mouth-shaped arch, canvas, NunDB real-time
+       ================================================================ */
+
+    const STATUSES = ['healthy', 'cavity', 'missing', 'crown', 'implant', 'fracture', 'watch'];
+    const COLORS = {
+        healthy:  { fill: '#e8f5e9', stroke: '#4caf50' },
+        cavity:   { fill: '#ffcdd2', stroke: '#e53935' },
+        missing:  { fill: '#e0e0e0', stroke: '#9e9e9e' },
+        crown:    { fill: '#fff9c4', stroke: '#fbc02d' },
+        implant:  { fill: '#bbdefb', stroke: '#1e88e5' },
+        fracture: { fill: '#ffe0b2', stroke: '#fb8c00' },
+        watch:    { fill: '#e1bee7', stroke: '#8e24aa' }
+    };
+
+    // Tooth type info for realistic shapes
+    // Universal numbering: 1-8 upper right, 9-16 upper left, 17-24 lower left, 25-32 lower right
+    function toothType(n) {
+        // Map to position 1-8 from midline
+        let pos;
+        if (n <= 8) pos = 9 - n;
+        else if (n <= 16) pos = n - 8;
+        else if (n <= 24) pos = 25 - n;
+        else pos = n - 24;
+        if (pos <= 2) return 'incisor';
+        if (pos === 3) return 'canine';
+        if (pos <= 5) return 'premolar';
+        return 'molar';
+    }
+
+    function toothWidth(n) {
+        const t = toothType(n);
+        if (t === 'molar') return 38;
+        if (t === 'premolar') return 32;
+        if (t === 'canine') return 30;
+        return 28;
+    }
+    function toothHeight(n) {
+        const t = toothType(n);
+        if (t === 'molar') return 38;
+        if (t === 'premolar') return 34;
+        if (t === 'canine') return 34;
+        return 30;
+    }
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Arch layout — U-shape
+    // Upper: teeth 1-16 arranged in an arch (1=upper-right-3rd-molar → 16=upper-left-3rd-molar)
+    // Lower: teeth 32-17 mirrored below
+    const UPPER = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
+    const LOWER = [32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17];
+
+    const CX = canvas.width / 2;   // center x
+    const UPPER_CY = 190;          // center of upper arch curve
+    const LOWER_CY = 430;          // center of lower arch curve
+    const ARCH_RX = 280;           // horizontal radius
+    const UPPER_RY = 160;          // vertical radius upper arch
+    const LOWER_RY = 160;          // vertical radius lower arch
+
+    const positions = {}; // { toothNum: { x, y, w, h, angle } }
+
+    function computeArchPositions(teeth, cy, ry, isUpper) {
+        // Distribute teeth along a half-ellipse arc
+        // Upper: arc from PI to 0 (left to right, opening downward)
+        // Lower: arc from PI to 0 (left to right, opening upward)
+        const count = teeth.length;
+        // Teeth are spaced along the arc, molars get slightly more space
+        const weights = teeth.map(n => {
+            const t = toothType(n);
+            if (t === 'molar') return 1.3;
+            if (t === 'premolar') return 1.05;
+            if (t === 'canine') return 1.0;
+            return 0.9;
+        });
+        const totalWeight = weights.reduce((a, b) => a + b, 0);
+
+        let cumAngle = Math.PI; // start from left
+        teeth.forEach((n, i) => {
+            const span = (weights[i] / totalWeight) * Math.PI;
+            const angle = cumAngle - span / 2; // center of this tooth's arc segment
+            cumAngle -= span;
+
+            const tw = toothWidth(n);
+            const th = toothHeight(n);
+            const ex = CX + ARCH_RX * Math.cos(angle);
+            const ey = cy + (isUpper ? -1 : 1) * ry * Math.sin(angle);
+
+            positions[n] = {
+                x: ex - tw / 2,
+                y: ey - th / 2,
+                cx: ex,
+                cy: ey,
+                w: tw,
+                h: th,
+                angle: angle
+            };
+        });
+    }
+
+    computeArchPositions(UPPER, UPPER_CY, UPPER_RY, true);
+    computeArchPositions(LOWER, LOWER_CY, LOWER_RY, false);
+
+    // === State ===
+    let state = defaultState();
+    let selectedTooth = null;
+    let hoveredTooth = null;
+
+    function defaultState() {
+        const teeth = {};
+        for (let i = 1; i <= 32; i++) teeth[i] = { status: 'healthy', note: '' };
+        return {
+            sessionId: '',
+            patientId: '',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            version: 1,
+            selectedTool: 'cavity',
+            teeth
+        };
+    }
+
+    // === URL / Session ===
+    function getSessionFromUrl() {
+        return new URLSearchParams(window.location.search).get('session');
+    }
+    function updateUrl(sessionId) {
+        const url = new URL(window.location);
+        url.searchParams.set('session', sessionId);
+        window.history.replaceState({}, '', url);
+    }
+    function generateId() {
+        return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    }
+
+    // === Rendering ===
+    function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw arch guide curves
+        ctx.save();
+        ctx.strokeStyle = '#e5e7eb';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 5]);
+        // Upper arch
+        ctx.beginPath();
+        ctx.ellipse(CX, UPPER_CY, ARCH_RX + 30, UPPER_RY + 20, 0, Math.PI, 0);
+        ctx.stroke();
+        // Lower arch
+        ctx.beginPath();
+        ctx.ellipse(CX, LOWER_CY, ARCH_RX + 30, LOWER_RY + 20, 0, 0, Math.PI);
+        ctx.stroke();
+        ctx.restore();
+
+        // Labels
+        ctx.font = 'bold 12px -apple-system, sans-serif';
+        ctx.fillStyle = '#b0b8c4';
+        ctx.textAlign = 'center';
+        ctx.fillText('UPPER (Maxillary)', CX, 18);
+        ctx.fillText('LOWER (Mandibular)', CX, canvas.height - 8);
+
+        // Midline
+        ctx.save();
+        ctx.strokeStyle = '#d1d5db';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(CX, 25);
+        ctx.lineTo(CX, canvas.height - 18);
+        ctx.stroke();
+        ctx.restore();
+
+        // R / L labels
+        ctx.font = 'bold 11px -apple-system, sans-serif';
+        ctx.fillStyle = '#c0c8d0';
+        ctx.textAlign = 'left';
+        ctx.fillText('R', 12, canvas.height / 2);
+        ctx.textAlign = 'right';
+        ctx.fillText('L', canvas.width - 12, canvas.height / 2);
+
+        // Draw all teeth
+        for (let i = 1; i <= 32; i++) drawTooth(i);
+    }
+
+    function drawTooth(num) {
+        const pos = positions[num];
+        const tooth = state.teeth[num] || { status: 'healthy', note: '' };
+        const colors = COLORS[tooth.status] || COLORS.healthy;
+        const isSel = selectedTooth === num;
+        const isHov = hoveredTooth === num;
+        const { x, y, w, h, cx: tcx, cy: tcy, angle } = pos;
+        const type = toothType(num);
+        const isUp = num <= 16;
+
+        ctx.save();
+
+        // Shadow for selected
+        if (isSel) {
+            ctx.shadowColor = 'rgba(0,0,0,0.2)';
+            ctx.shadowBlur = 12;
+            ctx.shadowOffsetY = 2;
+        }
+
+        // Draw tooth shape — realistic outline
+        ctx.beginPath();
+        drawToothShape(ctx, x, y, w, h, type, isUp);
+        ctx.fillStyle = colors.fill;
+        ctx.fill();
+
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetY = 0;
+
+        // Border
+        ctx.lineWidth = isSel ? 2.5 : (isHov ? 2 : 1.5);
+        ctx.strokeStyle = isSel ? '#1a1a2e' : (isHov ? '#4b5563' : colors.stroke);
+        if (tooth.status === 'missing') ctx.setLineDash([3, 3]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Inner occlusal surface pattern
+        const margin = w * 0.28;
+        const ix = x + margin, iy = y + margin;
+        const iw = w - margin * 2, ih = h - margin * 2;
+
+        ctx.strokeStyle = isSel ? '#555' : colors.stroke;
+        ctx.lineWidth = 0.8;
+
+        // Inner rect
+        ctx.beginPath();
+        roundRect(ctx, ix, iy, iw, ih, 2);
+        ctx.stroke();
+
+        // Corner diagonals
+        ctx.beginPath();
+        ctx.moveTo(x + 3, y + 3); ctx.lineTo(ix, iy);
+        ctx.moveTo(x + w - 3, y + 3); ctx.lineTo(ix + iw, iy);
+        ctx.moveTo(x + w - 3, y + h - 3); ctx.lineTo(ix + iw, iy + ih);
+        ctx.moveTo(x + 3, y + h - 3); ctx.lineTo(ix, iy + ih);
+        ctx.stroke();
+
+        // X for missing
+        if (tooth.status === 'missing') {
+            ctx.strokeStyle = '#9e9e9e';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(x + 4, y + 4); ctx.lineTo(x + w - 4, y + h - 4);
+            ctx.moveTo(x + w - 4, y + 4); ctx.lineTo(x + 4, y + h - 4);
+            ctx.stroke();
+        }
+
+        // Crown icon
+        if (tooth.status === 'crown') {
+            ctx.strokeStyle = '#f57f17';
+            ctx.lineWidth = 1.5;
+            const crY = isUp ? y + h + 3 : y - 7;
+            ctx.beginPath();
+            ctx.moveTo(tcx - 6, crY + 4);
+            ctx.lineTo(tcx - 4, crY);
+            ctx.lineTo(tcx, crY + 3);
+            ctx.lineTo(tcx + 4, crY);
+            ctx.lineTo(tcx + 6, crY + 4);
+            ctx.stroke();
+        }
+
+        // Implant icon (small screw marks)
+        if (tooth.status === 'implant') {
+            ctx.strokeStyle = '#1565c0';
+            ctx.lineWidth = 1;
+            const iy2 = isUp ? y + h + 3 : y - 9;
+            for (let j = 0; j < 3; j++) {
+                ctx.beginPath();
+                ctx.moveTo(tcx - 4, iy2 + j * 3);
+                ctx.lineTo(tcx + 4, iy2 + j * 3);
+                ctx.stroke();
+            }
+        }
+
+        // Tooth number
+        const numY = isUp ? y - 10 : y + h + 14;
+        ctx.font = 'bold 10px -apple-system, sans-serif';
+        ctx.fillStyle = isSel ? '#1a1a2e' : '#6b7280';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(String(num), tcx, numY);
+
+        // Note indicator dot
+        if (tooth.note) {
+            ctx.fillStyle = '#fb8c00';
+            ctx.beginPath();
+            ctx.arc(x + w - 2, y + 2, 3.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
+
+        ctx.restore();
+    }
+
+    function drawToothShape(ctx, x, y, w, h, type, isUpper) {
+        const r = 4;
+        if (type === 'molar') {
+            // Wider, slightly bumpy top/bottom for cusps
+            const cusp = 2;
+            if (isUpper) {
+                ctx.moveTo(x + r, y);
+                ctx.lineTo(x + w * 0.3, y);
+                ctx.quadraticCurveTo(x + w * 0.3, y - cusp, x + w * 0.5, y);
+                ctx.quadraticCurveTo(x + w * 0.7, y - cusp, x + w * 0.7, y);
+                ctx.lineTo(x + w - r, y);
+                ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+                ctx.lineTo(x + w, y + h - r);
+                ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+                ctx.lineTo(x + r, y + h);
+                ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+                ctx.lineTo(x, y + r);
+                ctx.quadraticCurveTo(x, y, x + r, y);
+            } else {
+                ctx.moveTo(x + r, y);
+                ctx.lineTo(x + w - r, y);
+                ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+                ctx.lineTo(x + w, y + h - r);
+                ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+                ctx.lineTo(x + w * 0.7, y + h);
+                ctx.quadraticCurveTo(x + w * 0.7, y + h + cusp, x + w * 0.5, y + h);
+                ctx.quadraticCurveTo(x + w * 0.3, y + h + cusp, x + w * 0.3, y + h);
+                ctx.lineTo(x + r, y + h);
+                ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+                ctx.lineTo(x, y + r);
+                ctx.quadraticCurveTo(x, y, x + r, y);
+            }
+        } else if (type === 'canine') {
+            // Slightly pointed
+            const point = 3;
+            if (isUpper) {
+                ctx.moveTo(x + r, y);
+                ctx.lineTo(x + w / 2 - 2, y);
+                ctx.lineTo(x + w / 2, y - point);
+                ctx.lineTo(x + w / 2 + 2, y);
+                ctx.lineTo(x + w - r, y);
+                ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+                ctx.lineTo(x + w, y + h - r);
+                ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+                ctx.lineTo(x + r, y + h);
+                ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+                ctx.lineTo(x, y + r);
+                ctx.quadraticCurveTo(x, y, x + r, y);
+            } else {
+                ctx.moveTo(x + r, y);
+                ctx.lineTo(x + w - r, y);
+                ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+                ctx.lineTo(x + w, y + h - r);
+                ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+                ctx.lineTo(x + w / 2 + 2, y + h);
+                ctx.lineTo(x + w / 2, y + h + point);
+                ctx.lineTo(x + w / 2 - 2, y + h);
+                ctx.lineTo(x + r, y + h);
+                ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+                ctx.lineTo(x, y + r);
+                ctx.quadraticCurveTo(x, y, x + r, y);
+            }
+        } else {
+            // Incisors & premolars: simple rounded rect
+            roundRect(ctx, x, y, w, h, r);
+        }
+        ctx.closePath();
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+    }
+
+    // === Hit Detection ===
+    function hitTest(mx, my) {
+        for (let i = 1; i <= 32; i++) {
+            const p = positions[i];
+            if (mx >= p.x && mx <= p.x + p.w && my >= p.y && my <= p.y + p.h) return i;
+        }
+        return null;
+    }
+
+    // === NunDB ===
+    let nundb = null;
+    const connStatus = document.getElementById('connection-status');
+
+    async function connectNunDB() {
+        try {
+            nundb = new NunDb({
+                url: 'wss://ws-staging.nundb.org/',
+                db: 'odontogram-demo',
+                token: 'odontogram-token'
+            });
+            await nundb._connectionPromise;
+            connStatus.textContent = 'Connected to NunDB';
+            connStatus.className = 'connected';
+        } catch (e) {
+            console.error('NunDB connection failed:', e);
+            connStatus.textContent = 'Offline — changes are local only';
+            connStatus.className = 'error';
+            nundb = null;
+        }
+    }
+
+    function nundbKey() {
+        return 'odontogram-' + state.sessionId;
+    }
+
+    async function loadSession() {
+        if (!nundb) return;
+        try {
+            const result = await nundb.get(nundbKey());
+            if (result && result.value && result.value !== '' && result.value !== 'not-found') {
+                const data = typeof result.value === 'string' ? JSON.parse(result.value) : result.value;
+                const base = defaultState();
+                state = { ...base, ...data, teeth: { ...base.teeth, ...(data.teeth || {}) } };
+            }
+        } catch (e) {
+            console.log('No existing session found, using defaults');
+        }
+        setActiveTool(state.selectedTool);
+        render();
+        updateNotePanel();
+    }
+
+    function saveSession() {
+        state.updatedAt = new Date().toISOString();
+        if (!nundb) return;
+        try {
+            nundb.set(nundbKey(), state);
+        } catch (e) {
+            console.error('Save failed:', e);
+        }
+    }
+
+    // Real-time sync via NunDB watch
+    function watchSession() {
+        if (!nundb) return;
+        nundb.watch(nundbKey(), (data) => {
+            if (data && data.value) {
+                const incoming = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+                // Only apply if it's actually newer (avoid echo from own saves)
+                if (incoming.updatedAt && incoming.updatedAt > state.updatedAt) {
+                    const base = defaultState();
+                    state = { ...base, ...incoming, teeth: { ...base.teeth, ...(incoming.teeth || {}) } };
+                    setActiveTool(state.selectedTool);
+                    render();
+                    updateNotePanel();
+                }
+            }
+        });
+    }
+
+    // === Toolbar ===
+    const toolbar = document.getElementById('toolbar');
+
+    function buildToolbar() {
+        toolbar.innerHTML = '';
+        STATUSES.forEach(s => {
+            const btn = document.createElement('button');
+            btn.className = 'tool-btn';
+            btn.dataset.tool = s;
+            btn.textContent = s;
+            btn.addEventListener('click', () => setActiveTool(s));
+            toolbar.appendChild(btn);
+        });
+        setActiveTool(state.selectedTool);
+    }
+
+    function setActiveTool(tool) {
+        state.selectedTool = tool;
+        toolbar.querySelectorAll('.tool-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.tool === tool);
+        });
+    }
+
+    // === Note Panel ===
+    const notePanel = document.getElementById('note-panel');
+    const noteLabel = document.getElementById('note-label');
+    const noteInput = document.getElementById('note-input');
+
+    function updateNotePanel() {
+        if (selectedTooth === null) {
+            notePanel.classList.remove('visible');
+            return;
+        }
+        notePanel.classList.add('visible');
+        noteLabel.textContent = 'Tooth ' + selectedTooth + ':';
+        const tooth = state.teeth[selectedTooth];
+        noteInput.value = tooth ? tooth.note : '';
+    }
+
+    noteInput.addEventListener('input', () => {
+        if (selectedTooth === null) return;
+        state.teeth[selectedTooth].note = noteInput.value;
+        saveSession();
+        render();
+    });
+
+    // === Canvas Events ===
+    canvas.addEventListener('click', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const mx = (e.clientX - rect.left) * scaleX;
+        const my = (e.clientY - rect.top) * scaleY;
+        const hit = hitTest(mx, my);
+
+        if (hit !== null) {
+            state.teeth[hit].status = state.selectedTool;
+            selectedTooth = hit;
+            saveSession();
+            render();
+            updateNotePanel();
+            noteInput.focus();
+        } else {
+            selectedTooth = null;
+            render();
+            updateNotePanel();
+        }
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const mx = (e.clientX - rect.left) * scaleX;
+        const my = (e.clientY - rect.top) * scaleY;
+        const hit = hitTest(mx, my);
+
+        if (hit !== hoveredTooth) {
+            hoveredTooth = hit;
+            canvas.style.cursor = hit !== null ? 'pointer' : 'default';
+            render();
+        }
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+        if (hoveredTooth !== null) {
+            hoveredTooth = null;
+            render();
+        }
+    });
+
+    // === Init ===
+    async function init() {
+        buildToolbar();
+
+        let sessionId = getSessionFromUrl();
+        if (!sessionId) {
+            sessionId = generateId();
+        }
+        state.sessionId = sessionId;
+        updateUrl(sessionId);
+
+        document.getElementById('session-info').textContent = 'Session: ' + sessionId;
+
+        render();
+
+        await connectNunDB();
+        await loadSession();
+        watchSession();
+    }
+
+    // Expose internals for testing
+    window.__odontogram = {
+        get state() { return state; },
+        set state(v) { state = v; },
+        get positions() { return positions; },
+        get selectedTooth() { return selectedTooth; },
+        hitTest,
+        render,
+        saveSession,
+        loadSession,
+        setActiveTool
+    };
+
+    init();
+    </script>
+</body>
+</html>
